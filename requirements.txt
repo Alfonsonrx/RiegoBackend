@@ -1,0 +1,21 @@
+# FastAPI
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+python-multipart==0.0.17
+
+# Database (Supabase Postgres)
+sqlalchemy==2.0.36
+alembic==1.14.0
+psycopg2-binary==2.9.10
+
+# Authentication (your own JWT)
+passlib[bcrypt]==1.7.4
+bcrypt==4.2.1
+python-jose[cryptography]==3.3.0
+
+# Settings
+pydantic-settings==2.6.1
+python-dotenv==1.0.1
+
+# Optional
+httpx==0.28.0
