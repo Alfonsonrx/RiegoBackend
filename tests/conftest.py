@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import pytest
 from dotenv import load_dotenv
@@ -12,12 +13,28 @@ if _test_db == os.getenv("DB_NAME", "db_riego"):
     pytest.exit("TEST_DB_NAME no puede ser la base real: las pruebas la vacían", returncode=2)
 os.environ["DB_NAME"] = _test_db
 
+from alembic import command
+from alembic.config import Config
 from fastapi.testclient import TestClient
 from sqlalchemy import text
 
 from app.database import SessionLocal, engine
-from app.main import app  # create_all runs here, on the test database
+from app.main import app
 from app.models import Base
+
+
+@pytest.fixture(scope="session")
+def alembic_cfg():
+    return Config(str(Path(__file__).resolve().parent.parent / "alembic.ini"))
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _schema(alembic_cfg):
+    """Rebuild the test database from the migrations once per run, whatever the last run left (002 D6)."""
+    Base.metadata.drop_all(engine)
+    with engine.begin() as conn:
+        conn.execute(text("DROP TABLE IF EXISTS alembic_version"))
+    command.upgrade(alembic_cfg, "head")
 
 
 @pytest.fixture(autouse=True)

@@ -2,16 +2,15 @@ from fastapi import Depends, FastAPI
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from . import models
-from .database import engine, get_db
+from .database import get_db
 from .routers import auth
 
-models.Base.metadata.create_all(engine)
-
+# The schema comes only from migrations (`alembic upgrade head`); starting the app never touches it.
 app = FastAPI()
 app.include_router(auth.router)
 
-# Example: get connection (health check)
+
+# Health check: the database server answers. It does not tell whether the migrations were applied.
 @app.get("/db-check")
 def db_check(db: Session = Depends(get_db)):
     db.execute(text("SELECT 1"))
