@@ -15,7 +15,9 @@ python-jose[cryptography]==3.3.0
 
 # Settings
 pydantic-settings==2.6.1
+email-validator==2.4.0
 python-dotenv==1.0.1
 
 # Optional
 httpx==0.28.0
+pytest==9.2.0

@@ -4,10 +4,12 @@ from sqlalchemy.orm import Session
 
 from . import models
 from .database import engine, get_db
+from .routers import auth
 
 models.Base.metadata.create_all(engine)
 
 app = FastAPI()
+app.include_router(auth.router)
 
 # Example: get connection (health check)
 @app.get("/db-check")

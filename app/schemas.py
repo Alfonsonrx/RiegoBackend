@@ -1,11 +1,11 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 
 class UserCreate(BaseModel):
     name: str
-    email: str
+    email: EmailStr
     password: str
 
 
@@ -16,3 +16,8 @@ class UserOut(BaseModel):
     name: str
     email: str
     created_at: datetime | None = None
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
