@@ -112,3 +112,31 @@ class SensorCreated(SensorOut):
 
 class IngestKeyOut(BaseModel):
     ingest_key: str
+
+
+class ReadingIn(BaseModel):
+    value: Limit  # same Numeric(5, 2) column as the limits: ±999.99 (103 FR-1.e)
+
+
+class ReadingOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    sensor_id: int
+    value: float
+    recorded_at: datetime
+
+
+class IngestOut(ReadingOut):
+    reading_interval_minutes: int  # tells the device when to send next (103 D2)
+
+
+class ConditionOut(BaseModel):
+    sensor_id: int
+    name: str
+    type: str
+    unit: str
+    min_val: float | None
+    max_val: float | None
+    value: float | None  # None until the sensor sends its first reading (103 FR-3.b)
+    recorded_at: datetime | None
