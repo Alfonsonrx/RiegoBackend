@@ -54,3 +54,13 @@ def client():
 def db():
     with SessionLocal() as session:
         yield session
+
+
+@pytest.fixture
+def account(client):
+    """`account(email)` registers and logs in an account; returns (auth headers, user id)."""
+    def make(email):
+        user = client.post("/auth/register", json={"name": "N", "email": email, "password": "orquidea-123"})
+        login = client.post("/auth/login", data={"username": email, "password": "orquidea-123"})
+        return {"Authorization": f"Bearer {login.json()['access_token']}"}, user.json()["id"]
+    return make
