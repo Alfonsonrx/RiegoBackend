@@ -1,13 +1,16 @@
 import importlib.util
 import os
 
+import pytest
 from alembic import command
 from alembic.autogenerate import compare_metadata
 from alembic.migration import MigrationContext
 from fastapi.testclient import TestClient
+from pydantic import ValidationError
 from sqlalchemy import create_engine, inspect, select, text
 from sqlalchemy.orm import sessionmaker
 
+from app.config import Settings, get_settings
 from app.database import engine, get_db
 from app.main import app
 from app.models import Base, User
@@ -96,7 +99,15 @@ def test_002_fr2b_db_check_not_ok_when_db_unreachable(monkeypatch):
     assert r.status_code == 500
 
 
-def test_002_fr3a_connection_from_environment(monkeypatch):
+@pytest.fixture
+def fresh_settings():
+    """Make a fresh app.database read the environment again instead of the cached settings."""
+    get_settings.cache_clear()
+    yield
+    get_settings.cache_clear()
+
+
+def test_002_fr3a_connection_from_environment(monkeypatch, fresh_settings):
     for name, value in {"DB_HOST": "db.test", "DB_PORT": "6543", "DB_NAME": "riego_x",
                         "DB_USER": "u_test", "DB_PW": "pw_test"}.items():
         monkeypatch.setenv(name, value)
@@ -104,3 +115,16 @@ def test_002_fr3a_connection_from_environment(monkeypatch):
     matches = [url.host == "db.test", url.port == 6543, url.database == "riego_x",
                url.username == "u_test", url.password == "pw_test"]
     assert all(matches), matches  # booleans only: never print the URL
+
+
+def test_002_fr3a_no_default_credentials(monkeypatch, fresh_settings):
+    secrets = [os.environ["DB_PW"], os.environ["SECRET_KEY"]]
+    monkeypatch.setitem(Settings.model_config, "env_file", None)  # only the environment, no .env file
+    for name, value in (("DB_USER", None), ("DB_PW", "")):  # unset, and empty as in .env.example
+        with monkeypatch.context() as m:
+            m.delenv(name) if value is None else m.setenv(name, value)
+            get_settings.cache_clear()
+            with pytest.raises(ValidationError) as err:
+                _fresh("app.database")
+        named, leaks = name in str(err.value), any(s in str(err.value) for s in secrets)
+        assert named and not leaks, (name, named, leaks)  # booleans only: never print the message
