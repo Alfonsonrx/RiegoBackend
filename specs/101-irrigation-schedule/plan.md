@@ -55,7 +55,7 @@ puede ser `null`).
 
 **D2 — "Ahora" es `datetime.now(ZoneInfo(settings.TIMEZONE))` sin zona, comparado con `datetime.combine(fecha, hora)`; se encapsula en `local_now()` para fijarlo en pruebas.** El valor por defecto de `TIMEZONE` es `America/Santiago` (el brief es de una institución chilena; cámbiese por entorno). `zoneinfo` es de la biblioteca estándar. *Discarded:* hora del servidor (si corre en UTC corre las horas); librería de zonas (no hace falta). (FR-1.d, FR-3.b)
 
-**D3 — `PATCH` parcial con `model_fields_set`; solo se revalida el futuro si el cambio trae fecha u hora, usando la fecha u hora ya guardada para completar el par.** *Discarded:* `PUT` con reemplazo completo (obliga a reenviar todo para solo desactivar). (FR-3.a, FR-3.b)
+**D3 — `PATCH` parcial con `model_fields_set`; solo se revalida el futuro si el cambio modifica la fecha o la hora (traerlas con el mismo valor no cuenta, T06), usando la fecha u hora ya guardada para completar el par.** *Discarded:* `PUT` con reemplazo completo (obliga a reenviar todo para solo desactivar). (FR-3.a, FR-3.b)
 
 **D4 — Orden por `irrigation_date`, `irrigation_time`, `id`** (el `id` desempata de forma estable). (FR-2.a)
 
@@ -78,7 +78,9 @@ la ruta de registro y sus tokens por la de inicio de sesión. `local_now()` se f
 | FR-2.c | Given una entrada activa y una inactiva / When A pide con y sin `active_only=true` / Then con el filtro solo la activa; sin él, ambas | both sides |
 | FR-3.a | Given una entrada de A / When A cambia hora y luego `is_active` / Then cada cambio queda guardado y responde la entrada actualizada | event |
 | FR-3.b | Given una entrada futura de A / When A le pone 2026-11-12 / Then 400 con el mensaje y la entrada intacta; y desactivar una entrada vencida sí funciona | negative |
+| FR-3.b | Given una entrada vencida de A / When A la reenvía completa con su misma fecha y hora e `is_active` falso / Then 200 y queda inactiva | positive |
 | FR-3.c | Given una entrada de B y un id inexistente / When A los cambia / Then 404 "Entrada de riego no encontrada" en ambos y la de B intacta | negative |
+| FR-3.d | Given una entrada de A / When A envía `null` en fecha, hora o estado, o una hora inválida / Then 422 y la entrada intacta | negative |
 
 ## 6. Build order
 

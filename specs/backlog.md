@@ -36,3 +36,4 @@ lo que **no** cubren.
 - **Agregados para gráficos** (promedio por hora/día) y **política de retención/purga** de lecturas (103 §7).
 - **CORS y despliegue** (la interfaz web vive en otro origen): sin dueño.
 - **CI** (no hay workflow): sin dueño.
+- **passlib con bcrypt 4.x registra `module 'bcrypt' has no attribute '__about__'`** al hashear (funciona, pero ensucia el registro; passlib no tiene mantenimiento) · source: 101 review · target: → 001 (usar `bcrypt` directo o fijar una versión compatible).

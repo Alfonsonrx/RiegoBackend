@@ -40,3 +40,13 @@ def get_current_user(
     if user is None:
         raise credentials_exception
     return user
+
+def get_owned_or_404(db: Session, model, owner_column, row_id: int, user: models.User, detail: str):
+    """The row `row_id` of `model` if `user` owns it, else 404 with `detail`.
+
+    Someone else's row and a missing row get the same answer, never 403 (profile rule 1).
+    """
+    row = db.query(model).filter(model.id == row_id, owner_column == user.id).first()
+    if row is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=detail)
+    return row

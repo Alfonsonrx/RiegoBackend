@@ -47,8 +47,9 @@ desactivó.
 La persona corrige la fecha o la hora, o desactiva la entrada sin borrarla (D2). Cambiar solo el estado de
 una entrada no revalida su fecha, para poder desactivar una entrada que ya venció.
 - (a) WHEN un usuario autenticado cambia la fecha, la hora o el estado activo de una entrada suya, the system shall guardar el cambio y responder con la entrada actualizada.
-- (b) IF un cambio deja la fecha y la hora de la entrada en un momento no posterior al actual, THEN the system shall rechazar el cambio con el mensaje "La fecha y hora de riego deben ser futuras" y dejar la entrada como estaba.
+- (b) IF un cambio modifica la fecha o la hora de la entrada y la deja en un momento no posterior al actual, THEN the system shall rechazar el cambio con el mensaje "La fecha y hora de riego deben ser futuras" y dejar la entrada como estaba.
 - (c) IF la entrada no existe o pertenece a otro usuario, THEN the system shall responder "Entrada de riego no encontrada" y no modificar ninguna entrada.
+- (d) IF un cambio trae una fecha, una hora o un estado vacíos o inválidos, THEN the system shall rechazar el cambio y dejar la entrada como estaba.
 
 ## 5. Non-functional requirements
 
@@ -65,6 +66,7 @@ una entrada no revalida su fecha, para poder desactivar una entrada que ya venci
 | Fecha y hora exactamente iguales al momento actual | Rechazada: no es posterior (FR-1.d). |
 | Dos entradas con la misma fecha y hora | Permitidas, ambas se guardan (D5). |
 | Cambiar solo el estado de una entrada vencida | Permitido; no se revalida la fecha (FR-3). |
+| Reenviar la entrada completa con la misma fecha y hora y otro estado | Solo cambia el estado: no se revalida la fecha (FR-3.b). |
 | Cambiar solo la hora | La fecha ya guardada y la hora nueva deben ser posteriores al momento actual (FR-3.b). |
 | Id de entrada de otra persona o inexistente | La misma respuesta "Entrada de riego no encontrada" (FR-3.c). |
 | Petición sin token o con token inválido | Rechazada por 001 FR-3, sin llegar a esta capacidad. |
@@ -100,3 +102,9 @@ None.
 - **D4 — Una sola zona horaria para todo el sistema, configurable: la hora local del invernadero.** *Por qué:* la base guarda fecha y hora sin zona (002 D3) y el brief describe un solo invernadero. *Costo:* personas en otra zona verían horas corridas (backlog).
 - **D5 — Se permiten entradas repetidas** (misma fecha y hora). *Por qué:* no hay riesgo, y prohibirlas obligaría a decidir qué hacer con las inactivas.
 - **D6 — Los RF se numeran como la tabla de requerimientos del brief (RF1–RF7).** *Por qué:* las fichas de detalle del brief saltan de RF4 a RF6 y numeran RF6–RF8 lo que la tabla llama RF5–RF7 (registro histórico, crear base, tiempo real); además la ficha RF8 repite por error la descripción de RF7 de la base de datos. Se sigue la tabla. Esta decisión rige para todos los specs 1xx.
+
+### Taken while building
+
+- **D7 — FR-3.d: un cambio con fecha, hora o estado vacíos o inválidos se rechaza** (round 1; aceptado por la persona dueña, 2026-11-17). *Por qué:* FR-1.c lo cubría al crear pero ningún bullet al cambiar; sin el rechazo, un `null` llegaría a una columna obligatoria y respondería con error de servidor.
+- **D8 — FR-3.b dice "modifica la fecha o la hora" en vez de "deja la fecha y la hora"** (round 2, T06; la persona dueña aprobó el comportamiento el 2026-11-17). *Por qué:* leída al pie de la letra, la versión anterior rechazaba también desactivar una entrada vencida, que la introducción de FR-3 y D3 permiten; y reenviar la entrada completa sin cambiar fecha ni hora no es cambiarlas.
+- **Rechazada (round 1): dependencia `tzdata` y validar `TIMEZONE` al cargar** (era T07; la persona dueña no la quiere, 2026-11-17). *Costo conocido:* en Windows Python no trae base de zonas horarias, y con una zona inexistente crear o cambiar una entrada responde con error de servidor.

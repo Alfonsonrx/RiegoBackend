@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     DB_PORT: int = 5432
     DB_NAME: str = "db_riego"
 
+    # Greenhouse wall clock: irrigation dates and times are read in this zone (101 D4)
+    TIMEZONE: str = "America/Santiago"
+
     # Tokens (001)
     SECRET_KEY: str  # no default: refuse to sign tokens with a guessable key
     ALGORITHM: str = "HS256"

@@ -75,7 +75,7 @@ Representación de la API (`NotificationOut`; no expone `user_id`):
 
 **D3 — "Ahora local" sale de `local_now()` (101 D2, zona `TIMEZONE`)**, que `send_due_reminders` recibe como parámetro para poder fijarlo en pruebas. (FR-1.a)
 
-**D4 — El `PATCH` de 101 pone `reminded_at = NULL` cuando el cambio trae fecha u hora.** Cambiar solo `is_active` no lo toca. *Discarded:* reiniciarlo al reactivar (avisaría dos veces la misma cita). (FR-1.c, FR-1.b)
+**D4 — El `PATCH` de 101 pone `reminded_at = NULL` cuando el cambio modifica la fecha o la hora (traerlas con el mismo valor no cuenta, 101 D8).** Cambiar solo `is_active` no lo toca. *Discarded:* reiniciarlo al reactivar (avisaría dos veces la misma cita). (FR-1.c, FR-1.b)
 
 **D5 — `alert_if_out_of_range` se llama en la ruta de recepción (103) después del commit de la lectura, dentro de `try/except` que registra el error y sigue.** La lectura anterior es la de mayor `id` con `id` < el de la nueva para ese sensor. "Fuera de rango" es `valor < min_val` o `valor > max_val`, omitiendo el lado vacío. La alerta se crea en su propia transacción. *Discarded:* una sola transacción para lectura y alerta (si la alerta falla se perdería la lectura). (FR-2)
 
