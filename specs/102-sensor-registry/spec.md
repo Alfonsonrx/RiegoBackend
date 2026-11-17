@@ -122,3 +122,9 @@ None.
 - **D4 — Cada sensor tiene su propia clave de ingesta** (respuesta de la persona dueña, 2026-11-13). Enmienda la regla 2 del perfil: la recepción de lecturas (103) se autentica con esa clave, no con el token de la persona. *Por qué:* el microcontrolador no debe guardar la contraseña de su dueña ni depender de un token que vence. *Descartado:* usar el token de la persona.
 - **D5 — Los sensores no se borran, se desactivan.** *Por qué:* RF5 pide historial; borrar un sensor borraría o dejaría huérfanas sus lecturas.
 - **D6 — Tipo, unidad y conexión no cambian después de crear el sensor.** *Por qué:* una lectura de "65" solo significa algo con su tipo y su unidad; para cambiarlos se registra otro sensor.
+
+### Taken while building
+
+- **Proposed (round 1): un bullet nuevo (k) en FR-1 — "IF el nombre falta, está vacío o tiene más de 100 caracteres, THEN the system shall rechazar la petición y no crear ningún sensor."** El código ya lo hace (la columna guarda 100 caracteres; sin el rechazo, un nombre largo daría error de servidor) y la prueba existe (`test_102_fr1_name_required_and_fits`). *Pendiente de la persona dueña.*
+- **Proposed (round 1): un bullet nuevo (g) en FR-3 — "IF un cambio trae un nombre o un estado vacíos o inválidos, THEN the system shall rechazar el cambio y dejar el sensor como estaba."** Igual que 101 D7: hoy ningún bullet lo pide y un `null` llegaría a una columna obligatoria. Código y prueba existen (`test_102_fr3_null_name_state_or_bad_name_rejected`). *Pendiente de la persona dueña.*
+- **Proposed (round 1): tope del intervalo.** FR-1.h y FR-3.d dicen "entero mayor o igual que 1"; el código también rechaza más de 2 147 483 647 minutos, lo máximo que cabe en la columna (si no, error de servidor). Opciones: escribir ese tope técnico en los dos bullets, o fijar un tope de producto (por ejemplo 1440, un día). *Pendiente de la persona dueña.*

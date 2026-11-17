@@ -79,7 +79,7 @@ Respuesta al crear (`SensorCreated`; la clave solo aparece aquí y al regenerar)
 
 **D2 — Tipos y conexiones como `Literal` de Pydantic y la tabla `SENSOR_TYPES` en un solo sitio.** Ampliarlas es agregar una entrada. *Discarded:* tabla de tipos en la base (ningún requisito la necesita). (FR-1.d–g)
 
-**D3 — Validación de intervalo y límites en el esquema (`Field(ge=1)`, `Decimal` con `max_digits=5` y `decimal_places=2`); el orden inferior ≤ superior se valida con los valores ya completados por los defaults (al crear) o mezclados con los guardados (al cambiar).** *Discarded:* confiar en la base (devolvería un error de servidor, no un 422). (FR-1.h–j, FR-3.c, FR-3.d)
+**D3 — Validación de intervalo y límites en el esquema (`Field(ge=1)`, `Decimal` con `max_digits=5` y `decimal_places=2`); el orden inferior ≤ superior lo valida `check_limits()` en la ruta, con los valores ya completados por los defaults (al crear) o mezclados con los guardados (al cambiar), con un solo mensaje: "El límite inferior no puede ser mayor que el superior" (round 1: antes decía "en el esquema").** *Discarded:* confiar en la base (devolvería un error de servidor, no un 422). (FR-1.h–j, FR-3.c, FR-3.d)
 
 **D4 — `PATCH` parcial con `model_fields_set`; un `null` explícito solo se acepta en `min_val` y `max_val`.** `extra="forbid"` produce el rechazo de FR-3.e. *Discarded:* campos extra ignorados en silencio (la persona creería haber cambiado el tipo). (FR-3)
 

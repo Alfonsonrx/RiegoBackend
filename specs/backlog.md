@@ -37,3 +37,4 @@ lo que **no** cubren.
 - **CORS y despliegue** (la interfaz web vive en otro origen): sin dueño.
 - **CI** (no hay workflow): sin dueño.
 - **passlib con bcrypt 4.x registra `module 'bcrypt' has no attribute '__about__'`** al hashear (funciona, pero ensucia el registro; passlib no tiene mantenimiento) · source: 101 review · target: → 001 (usar `bcrypt` directo o fijar una versión compatible).
+- **Registro con nombre de más de 100 caracteres (o correo de más de 150) responde 500** — las columnas `users.name`/`users.email` no caben y nada lo valida antes · source: 102 review · target: → 001 (límites de largo en `UserCreate`).

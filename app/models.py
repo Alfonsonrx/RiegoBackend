@@ -54,6 +54,7 @@ class Sensor(Base):
     max_val = Column(Numeric(5, 2), nullable=True)
     reading_interval_minutes = Column(Integer, nullable=False)
     is_active = Column(Boolean, server_default=text("true"), nullable=False)
+    ingest_key_hash = Column(String(64), unique=True, nullable=False)  # SHA-256 hex of the device key (102 D4)
 
     creator = relationship("User", back_populates="sensors")
     readings = relationship("SensorReading", back_populates="sensor")
