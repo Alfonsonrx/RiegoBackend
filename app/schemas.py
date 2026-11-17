@@ -140,3 +140,13 @@ class ConditionOut(BaseModel):
     max_val: float | None
     value: float | None  # None until the sensor sends its first reading (103 FR-3.b)
     recorded_at: datetime | None
+
+
+class NotificationOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    type: str
+    is_read: bool
+    message: str
+    created_at: datetime

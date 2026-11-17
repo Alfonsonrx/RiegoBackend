@@ -1,16 +1,18 @@
 import hmac
+import logging
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 from pydantic import AwareDatetime
 from sqlalchemy.orm import Session
 
-from .. import models, schemas
+from .. import models, notifications, schemas
 from ..database import get_db
 from ..deps import get_current_user
 from .sensors import hash_key, owned_sensor
 
 router = APIRouter(tags=["Lecturas"])
+log = logging.getLogger(__name__)
 
 BAD_KEY = "Clave de sensor inválida"
 INACTIVE = "Sensor inactivo"
@@ -38,9 +40,13 @@ def receive_reading(
     db.add(row)
     db.commit()
     db.refresh(row)  # recorded_at comes from the database clock (D2)
-    # 104 hooks its out-of-range alert here, after the commit (D7).
-    return schemas.IngestOut(**schemas.ReadingOut.model_validate(row).model_dump(),
-                             reading_interval_minutes=sensor.reading_interval_minutes)
+    out = schemas.IngestOut(**schemas.ReadingOut.model_validate(row).model_dump(),
+                            reading_interval_minutes=sensor.reading_interval_minutes)
+    try:  # after the commit and in its own transaction: a failed alert never loses the reading (104 FR-2.e)
+        notifications.alert_if_out_of_range(db, sensor, row)
+    except Exception:
+        log.exception("No se pudo crear la alerta de la lectura %s", row.id)
+    return out
 
 
 @router.get("/sensors/{sensor_id}/readings", response_model=list[schemas.ReadingOut])

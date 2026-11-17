@@ -66,6 +66,7 @@ def update_schedule(
     at = sent.get("irrigation_time", row.irrigation_time)
     if (day, at) != (row.irrigation_date, row.irrigation_time):  # same date and time resent: not a change (D8)
         require_future(day, at)
+        row.reminded_at = None  # a new moment is a new appointment: it gets its own reminder (104 D4)
     for field, value in sent.items():
         setattr(row, field, value)
     db.commit()

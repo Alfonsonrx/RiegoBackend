@@ -87,5 +87,6 @@ class IrrigationSchedule(Base):
     irrigation_date = Column(Date, nullable=False)
     irrigation_time = Column(Time, nullable=False)
     is_active = Column(Boolean, server_default=text("true"), nullable=False)
+    reminded_at = Column(DateTime(timezone=True))  # when its reminder was created; NULL = still due (104 D2)
 
     creator = relationship("User", back_populates="schedules")
