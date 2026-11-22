@@ -57,6 +57,10 @@ Nada construido (no hay `tests/`). Ver T14.
   `tests/test_001_accounts_auth.py`: las 15 filas de plan §5; las de T11/T12 nacen en rojo y se ponen en verde con esas tareas.
   *Made when:* `.venv/bin/python -m pytest tests -k 001 -q` pasa y `python3 .claude/skills/sdd/scripts/sdd_check.py specs/001-accounts-auth` no lista bullets sin prueba.
 
+- [x] **T15 — Ver mi cuenta** · FR-4.a · after T10
+  `app/routers/auth.py`: `GET /auth/me` con `get_current_user`, responde `UserOut`.
+  *Made when:* `.venv/bin/python -m pytest tests -k "001 and fr4" -q` pasa.
+
 ## D. Requirement coverage
 
 | FR | Tasks |
@@ -64,6 +68,7 @@ Nada construido (no hay `tests/`). Ver T14.
 | FR-1 | T01, T02, T03, T05, T10, T11, T12, T14 |
 | FR-2 | T02, T03, T04, T06, T08, T10, T14 |
 | FR-3 | T04, T08, T14 |
+| FR-4 | T15 |
 
 ## E. The gates
 
@@ -86,3 +91,4 @@ CI: ninguna definida (no hay workflow en el repo). Locales, tal como el perfil:
 - 2026-11-16 · T12 · done · `pytest -k "001 and (fr1e or fr1g)"` pasa, incluida la carrera.
 - 2026-11-16 · T14 · done · 16 pruebas de 001 en verde; `sdd_check` sin bullets sin prueba.
 - 2026-11-16 · round 1 · T07–T14 · gates green (import + 17 passed; warnings solo de starlette/anyio en Python 3.14) · floor: sin pruebas borradas, saltadas ni supresiones.
+- 2026-11-19 · T15 · done · 2 pruebas fr4a (fallaron con 404: sin ruta) · `GET /auth/me` → `UserOut`; sin token o token inválido → 401 por FR-3; pedido por la sesión del frontend (D6).

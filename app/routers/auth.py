@@ -6,7 +6,7 @@ from passlib.context import CryptContext
 
 from .. import models, schemas
 from ..database import get_db
-from ..deps import create_access_token
+from ..deps import create_access_token, get_current_user
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -55,3 +55,9 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 
     access_token = create_access_token(data={"sub": str(user.id)})
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@router.get("/me", response_model=schemas.UserOut)
+def me(user: models.User = Depends(get_current_user)):
+    """The account the token belongs to (001 FR-4); UserOut never carries the password or its hash (FR-1.c)."""
+    return user

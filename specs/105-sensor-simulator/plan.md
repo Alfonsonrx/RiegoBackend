@@ -10,7 +10,7 @@ Sin cambios: el simulador usa `POST /sensors/{sensor_id}/readings` de 103 tal co
 ### B. Tests, migrations and tooling
 | File | Holds | FR |
 |---|---|---|
-| `tools/sensor_sim.py` | todo el simulador: argumentos, `TIPOS` (límites y calibración por tipo), `Deriva`, `paso()` (un turno de un sensor), `correr()` (el bucle), `main()` | FR-1–FR-5 |
+| `tools/sensor_sim.py` | todo el simulador: argumentos, `TIPOS` (límites y calibración por tipo), `deriva()` (generador de valores; round 1: antes clase `Deriva`), `paso()` (un turno de un sensor), `correr()` (el bucle), `main()` | FR-1–FR-5 |
 | `tests/test_105_sensor_simulator.py` | plan §5, con `httpx.MockTransport` en lugar del backend y un reloj falso | FR-1–FR-5 |
 | `README.md` | sección "Simulador de sensores": cómo registrar dos sensores, exportar las claves y arrancarlo | FR-1 |
 | `docs/ScriptTemperatura/` | se borra entero (servidor, estado, generador y su `.git` anidado) una vez copiado lo que sirve | D3 del spec |
@@ -28,7 +28,7 @@ El simulador no guarda nada. Estado en memoria por sensor:
 | `id` | int | id del sensor en el backend |
 | `tipo` | `"temperature"` \| `"humidity"` | clave de `TIPOS` |
 | `clave` | str | clave de ingesta, leída de `SIM_KEY_<id>`; nunca se imprime |
-| `deriva` | `Deriva` | valor actual y generador de números |
+| `valores` | generador de `deriva()` | valores del sensor, cada uno desde el anterior; con su propio `random.Random` (semilla `"<semilla>-<id>"`) |
 | `intervalo_s` | float \| None | último `reading_interval_minutes × 60` aceptado; `None` hasta la primera aceptación |
 | `proximo` | float | momento (reloj monotónico) de su siguiente lectura |
 | `detenido` | bool | `True` tras una clave inválida |
@@ -111,7 +111,7 @@ donde `f` registra cada petición y responde lo que pida la prueba; reloj falso 
 | FR-1.b | Given sin `--url`; sin `--sensor`; `SIM_KEY_3` ausente; `--sensor soil:3` / When arranca / Then sale con código distinto de 0, el mensaje nombra el dato y el transporte no recibió ninguna petición | negative |
 | FR-1.c | Given `--demo-segundos 0`, `-5` y `abc` / When arranca / Then sale con código distinto de 0 y sin peticiones | negative |
 | FR-1.d | Given una clave conocida y respuestas 201, 401, 403 y `ConnectError` / When corre / Then la clave no aparece en `stdout` ni `stderr` | positive |
-| FR-2.a | Given `Deriva` de cada tipo con semilla 1 / When genera 10 000 valores / Then todos están en `[-1, 30]` y `[0, 100]` | positive |
+| FR-2.a | Given `deriva()` de cada tipo con semilla 1 / When genera 10 000 valores / Then todos están en `[-1, 30]` y `[0, 100]` | positive |
 | FR-2.b | Given esos valores / Then `round(v, 1) == v` en todos | positive |
 | FR-2.c | Given esos valores / Then cada par seguido difiere a lo sumo 1,0 (temperatura) y 3,0 (humedad) | positive |
 | FR-2.d | Given 100 semillas distintas / When se toma el primer valor de cada tipo / Then todos están en su banda | positive |
@@ -131,7 +131,7 @@ donde `f` registra cada petición y responde lo que pida la prueba; reloj falso 
 
 ## 6. Build order
 
-1. `Deriva` y `TIPOS`, con sus pruebas (FR-2); ajustar `sigma` y `k`.
+1. `deriva()` y `TIPOS`, con sus pruebas (FR-2); ajustar `sigma` y `k`.
 2. Argumentos y lectura de claves (FR-1.a–c).
 3. `paso()` con la tabla de D5 y la línea de consola (FR-3.b–c, FR-5.a–c).
 4. `correr()` y `main()` (FR-3.a, FR-4, FR-5.d–e, FR-1.d).

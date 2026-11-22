@@ -156,3 +156,21 @@ def test_001_fr3d_deleted_account_rejected(client, db):
     db.commit()
     r = me(client, token)
     assert (r.status_code, r.json()["detail"]) == (401, CRED)
+
+
+# FR-4 — Ver mi cuenta
+
+def test_001_fr4a_me_answers_own_account_without_password(client):
+    created = register(client).json()
+    register(client, name="Otra", email="otra@example.com")  # another account must not leak in
+    token = login(client).json()["access_token"]
+    r = client.get("/auth/me", headers={"Authorization": f"Bearer {token}"})
+    assert r.status_code == 200
+    assert r.json() == created  # id, name, email, created_at: the same shape as the register answer
+    assert not {"password", "password_hash"} & set(r.json())
+
+
+def test_001_fr4a_me_needs_a_valid_token(client):
+    assert client.get("/auth/me").status_code == 401  # FR-3.b
+    r = client.get("/auth/me", headers={"Authorization": "Bearer no-es-un-token"})
+    assert (r.status_code, r.json()["detail"]) == (401, CRED)  # FR-3.c

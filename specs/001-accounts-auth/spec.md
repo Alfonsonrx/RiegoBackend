@@ -57,6 +57,13 @@ que ninguna operación decida por su cuenta qué token acepta.
 - (c) IF el token está mal formado, vencido, firmado con otra clave o no lleva id de cuenta, THEN the system shall rechazar la petición con el mensaje "No se pudo validar las credenciales".
 - (d) IF la cuenta que nombra el token ya no existe, THEN the system shall rechazar la petición con el mensaje "No se pudo validar las credenciales".
 
+### FR-4 — Ver mi cuenta
+La interfaz necesita saber quién inició sesión (la cabecera muestra la inicial del nombre) y el inicio de
+sesión solo devuelve el token. La persona consulta su propia cuenta con el token; sin token o con uno
+inválido rige FR-3, y la contraseña nunca sale (FR-1.c). Agregado después del as-built (D6). Sirve a
+ningún RF directamente: apoya la interfaz de RF1–RF7.
+- (a) WHEN un usuario autenticado pide su cuenta, the system shall responder con su id, nombre, correo y fecha de creación.
+
 ## 5. Non-functional requirements
 
 - **Security:** contraseñas con hash de un solo sentido con sal; tokens firmados con una clave de la configuración; ningún secreto en respuestas, registros ni specs; mismo mensaje para correo desconocido y contraseña errónea.
@@ -104,6 +111,8 @@ None.
 - **D3 — Un solo mensaje para correo desconocido y contraseña errónea.** *Por qué:* decir cuál falló permite averiguar qué correos están registrados.
 - **D4 — Rechazo por correo duplicado con código 400 y mensaje en español, tal como está hoy.** *Descartado:* 409 (más convencional); se mantiene el comportamiento existente para no cambiar a quien ya lo consume.
 - **D5 — Los correos se comparan sin distinguir mayúsculas** (FR-1.g). *Por qué:* es lo que cualquier persona espera de un correo; hoy la base distingue y es una desviación, no una decisión de producto.
+
+- **D6 — Consulta de la cuenta propia (FR-4), agregada el 2026-11-19 a pedido de la sesión del frontend (CalendarioOrquideas), que informó la aprobación de la persona dueña.** *Por qué:* la cabecera del rediseño muestra la inicial del nombre y ninguna ruta decía quién inició sesión. *Descartado:* meter el nombre en el token (cambiaría FR-2.b y quedaría viejo si el nombre cambiara).
 
 ### Known deviations
 

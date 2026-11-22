@@ -57,6 +57,7 @@ Carga del token: `{"sub": "<id de cuenta como texto>", "exp": <vencimiento>}`.
 | `POST /auth/register` (JSON: `name`, `email`, `password`) | pública | n/a | 201 `UserOut`; 400 correo repetido; 422 cuerpo inválido | FR-1 |
 | `POST /auth/login` (formulario: `username`=correo, `password`) | pública | n/a | 200 `Token`; 401 con `WWW-Authenticate: Bearer` | FR-2 |
 | dependencia `get_current_user` | la usan 101–104 | entrega la cuenta | 401 "No se pudo validar las credenciales" | FR-3 |
+| `GET /auth/me` | bearer | la cuenta del token | 200 `UserOut`; 401 por FR-3 | FR-4 |
 | `GET /users` (en `routers/auth.py`) | ninguna | ninguna | no carga; **se elimina** (T09) | — |
 
 Sin pantallas: es una API.
@@ -118,3 +119,4 @@ nombres `test_001_fr1a_…` (ears.md). Los tokens vencidos se fabrican con
 | FR-1 | §1, §2, §3, §4 D2 D5 D6 D7, §5 |
 | FR-2 | §1, §2, §3, §4 D1 D3 D4, §5 |
 | FR-3 | §1, §2, §3, §4 D1 D4, §5 |
+| FR-4 | §3 |

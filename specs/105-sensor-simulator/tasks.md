@@ -10,16 +10,16 @@ Cada tarea escribe primero su prueba (plan §5) y luego el código. T01–T04 no
 Sin tareas: el simulador usa 103 FR-1 tal como está.
 
 ## B. Tests, migrations and tooling
-- [ ] **T01 — Deriva de valores** · FR-2.a, FR-2.b, FR-2.c, FR-2.d, FR-2.e, FR-2.f · after 002 T05
+- [x] **T01 — Deriva de valores** · FR-2.a, FR-2.b, FR-2.c, FR-2.d, FR-2.e, FR-2.f · after 002 T05
   `tools/sensor_sim.py`: `TIPOS` y `Deriva` (plan D2); ajustar `sigma` y `k` hasta que pase FR-2.e.
   *Made when:* `.venv/bin/python -m pytest tests -k "105 and fr2" -q` pasa.
-- [ ] **T02 — Argumentos y claves** · FR-1.b, FR-1.c
+- [x] **T02 — Argumentos y claves** · FR-1.b, FR-1.c
   `tools/sensor_sim.py`: `argparse` (`--url`, `--sensor tipo:id`, `--demo-segundos`, `--semilla`) y lectura de `SIM_KEY_<id>` (plan D1).
   *Made when:* `.venv/bin/python -m pytest tests -k "105 and (fr1b or fr1c)" -q` pasa.
-- [ ] **T03 — Un turno de un sensor** · FR-3.b, FR-3.c, FR-5.a
+- [x] **T03 — Un turno de un sensor** · FR-3.b, FR-3.c, FR-5.a
   `tools/sensor_sim.py`: `paso()` con la tabla de plan D5 y la línea de consola.
   *Made when:* `.venv/bin/python -m pytest tests -k "105 and (fr3b or fr3c or fr5a)" -q` pasa.
-- [ ] **T04 — El bucle y la salida** · FR-1.a, FR-1.d, FR-3.a, FR-4.a, FR-4.b, FR-4.c, FR-5.b, FR-5.c, FR-5.d, FR-5.e
+- [x] **T04 — El bucle y la salida** · FR-1.a, FR-1.d, FR-3.a, FR-4.a, FR-4.b, FR-4.c, FR-5.b, FR-5.c, FR-5.d, FR-5.e
   `tools/sensor_sim.py`: `correr()` con reloj y `dormir` inyectables (plan D3, D4, D6) y `main()`.
   *Made when:* `.venv/bin/python -m pytest tests -k 105 -q` pasa entero.
 
@@ -54,3 +54,9 @@ CI: ninguna definida. Locales: `.venv/bin/python -c "import app.main"` y `.venv/
 ## F. Log
 
 - 2026-11-16 · — · spec, plan y tasks escritos (draft) · sin tareas hechas.
+- 2026-11-17 · round 1 · base `f70d724` (solo cambios de 105 en el árbol) · modo round.
+- 2026-11-17 · T01 · done · 6 pruebas fr2a–f (fallaron: sin `tools`) · `TIPOS` y `deriva()`, un generador en lugar de la clase `Deriva` (plan §1/§2 actualizados); la calibración del plan pasó sin ajustes: 66–78 % dentro de la banda con las semillas 1–5; fr2c compara con tolerancia 1e-9 por el ruido de coma flotante (22.3 − 21.3 = 1.0000000000000018); finish line ok.
+- 2026-11-17 · T02 · done · 2 pruebas fr1b (falta `--url`, `--sensor`, `SIM_KEY_3` ausente o vacía, tipo `soil`, id no numérico) y fr1c (`0`, `-5`, `abc`, `nan`, `inf`) (fallaron: sin `main`) · `leer_config()` con `argparse` y mensajes propios en español; salen con código 2 sin ninguna petición; finish line ok.
+- 2026-11-17 · T03 · done · 3 pruebas fr3b, fr3c, fr5a sobre `paso()` (fallaron: sin `paso`) · tabla de plan D5 por código de estado; línea de consola con hora, sensor, tipo, valor y resultado; finish line ok.
+- 2026-11-17 · T04 · done · 10 pruebas fr1a, fr1d, fr3a, fr4a–c, fr5b–e con backend falso (`httpx.MockTransport`) y reloj falso (fallaron: `correr` no definido) · `correr()` (un hilo, el sensor vivo que toca primero) y `main()` (código 1 sin sensores vivos; Ctrl+C sale con 0); mutación: sin `s.intervalo_s` en la espera rompe 4 pruebas; `pytest -k 105` entero verde (21).
+- 2026-11-17 · round 1 · T01–T04 · gates green (import + 122 passed) · `sdd_check` 0 hallazgos, todos los bullets citados · floor: ninguna línea de prueba borrada, sin `skip` ni supresiones · revisión: los prefijos propios de `argparse` ("usage:", "error:", "argument …:") siguen en inglés, el texto de cada mensaje está en español; sin propuestas para §10, sin hallazgos. T05 (README y corrida real) y T06 (borrar `docs/ScriptTemperatura/`) quedan para el round 2.

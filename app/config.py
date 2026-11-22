@@ -27,6 +27,9 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
+    # Web UI origins allowed to call the API from a browser; in .env as a JSON list
+    CORS_ORIGINS: list[str] = ["http://localhost:8080", "http://127.0.0.1:8080"]
+
 
 @lru_cache
 def get_settings() -> Settings:
